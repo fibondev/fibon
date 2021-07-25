@@ -6,16 +6,9 @@ import "./Address.sol";
 import "./FibonToken.sol";
 
 
-    
-    
-
-
 contract FibonProxy is Context, IERC20 {
     using Address for address;
     
-
-
-    mapping (address => uint256) private _balances;
     
     FibonToken mainContract;
     address owner;

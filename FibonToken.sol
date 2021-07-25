@@ -230,10 +230,15 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         address sender = address(0);
         if(currentStage == IcoStages.icoPart1) 
             sender = icoPart1HolderAddress;
-        if(currentStage == IcoStages.icoPart2) 
+        if(currentStage == IcoStages.icoPart2) {
             sender = icoPart2HolderAddress;
-        if(currentStage == IcoStages.icoPart3) 
+            require(icoPart1Addresses[recipient] == 0,"ERC20: ico1 already used");
+        }
+        if(currentStage == IcoStages.icoPart3) {
             sender = icoPart3HolderAddress;
+            require(icoPart1Addresses[recipient] == 0,"ERC20: ico1 already used");
+            require(icoPart2Addresses[recipient] == 0,"ERC20: ico2 already used");
+        }
         
          require(sender != address(0), "ERC20: ico holder cannot be found");
         //_beforeTokenTransfer(sender, recipient, amount);

@@ -13,7 +13,6 @@ import "./FibonToken.sol";
 contract FibonAdmin is Context, IERC20Admin {
     using Address for address;
     
-    mapping (address => uint256) private _balances;
     
     FibonToken mainContract;
     address private owner;
@@ -30,7 +29,7 @@ contract FibonAdmin is Context, IERC20Admin {
        
     }
 
-    function changeMainContract(address newAddress) public returns (bool){
+    function changeMainContract(address newAddress) public virtual returns (bool){
         require(_msgSender() == owner, "ERC20: Unauthorized access.");
         require(newAddress != address(0), "ERC20: proxy contract zero address");
         mainContractAddress = newAddress;
