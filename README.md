@@ -1,16 +1,25 @@
-Contract List
+##Contract List
 
 #FibonToken -> Main Contract: Includes whole operations for transfers and ico processes.
+
 #FibonAdmin -> Admin Contract: Includes administration methods.
+
 #FibonProxy -> Proxy Contract: Includes ERC20 methods to redirect main contract.
+
 #IERC20 -> ERC20 Interface: Includes ERC20 abstract methods to use in FibonProxy and FibonToken. (from openzeppelin)
+
 #IERC20Admin -> ERC20 ICO Interface: Includes ICO abstract methods to use in FibonAdmin and FibonToken.
+
 #IcoUtil -> ICO library: Includes ICO util methods and structures. 
+
 #Address -> Address library: Includes address structure util methods. (from openzeppelin)
+
 #Context -> Context library: Includes message context util methods. (from openzeppelin)
+
 #SafeMath -> Math library: Includes math operations util methods. (from openzeppelin)
 
-Explanations
+
+##Explanations
 
 
 #FibonProxy: Customers will use FibonProxy contract that will be certain contract and will not change in the future. Even if main contract will change, proxy contract will be the same so customers doesnt need to change anything to reach their assets. FibonProxy is used for only redirection to FibonToken contract.
