@@ -35,9 +35,9 @@ contract FibonToken is Context, IERC20, IERC20Admin {
     
     //utils
     
-    uint256 private oneYearParam = 31536000; //1 year
-    uint256 private sixMonthsParam = 15552000;  //180 days
-    uint256 private threeMonthsParam = 7776000; //90 days
+    uint256 private oneYearParam = 365 * 1 days; //1 year
+    uint256 private sixMonthsParam = 180 * 1 days;  //180 days
+    uint256 private threeMonthsParam = 90 * 1 days; //90 days
     
     
     uint256 private icoPart1Deadline;
@@ -102,9 +102,9 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         
         //ico deadlines
         
-        icoPart1Deadline = getTime() + oneYearParam;
-        icoPart2Deadline = getTime() + sixMonthsParam;
-        icoPart3Deadline = getTime() + threeMonthsParam;
+        icoPart1Deadline = getTime().add(oneYearParam);
+        icoPart2Deadline = getTime().add(sixMonthsParam);
+        icoPart3Deadline = getTime().add(threeMonthsParam);
         
         
         //icoholderdistribution
@@ -201,8 +201,8 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         
        
         if(frozenAddressList[sender] > 0){
-            require(isTimeUp(frozenAddressList[sender]), "ERC20: sender account locked yet");
-            delete frozenAddressList[sender];
+            require(isTimeUp(frozenAddressList[sender]), "ERC20: sender account still locked");
+            frozenAddressList[sender] = 0;
         }
 
         _beforeTokenTransfer(sender, recipient, amount);
@@ -228,13 +228,12 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         require(amount > 0, "ERC20: transfer zero amount");
         
         address sender = address(0);
-        if(currentStage == IcoStages.icoPart1) 
+        if(currentStage == IcoStages.icoPart1) {
             sender = icoPart1HolderAddress;
-        if(currentStage == IcoStages.icoPart2) {
+        } else if(currentStage == IcoStages.icoPart2) {
             sender = icoPart2HolderAddress;
             require(icoPart1Addresses[recipient] == 0,"ERC20: ico1 already used");
-        }
-        if(currentStage == IcoStages.icoPart3) {
+        } else if(currentStage == IcoStages.icoPart3) {
             sender = icoPart3HolderAddress;
             require(icoPart1Addresses[recipient] == 0,"ERC20: ico1 already used");
             require(icoPart2Addresses[recipient] == 0,"ERC20: ico2 already used");
@@ -248,14 +247,10 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         if(currentStage == IcoStages.icoPart1) {
             icoPart1Addresses[recipient] = icoPart1Deadline;
             frozenAddressList[recipient] = icoPart1Deadline;
-        }
-            
-        if(currentStage == IcoStages.icoPart2) {
+        } else if(currentStage == IcoStages.icoPart2) {
             icoPart2Addresses[recipient] = icoPart2Deadline;
             frozenAddressList[recipient] = icoPart2Deadline;
-        }
-            
-        if(currentStage == IcoStages.icoPart3) {
+        } else if(currentStage == IcoStages.icoPart3) {
             icoPart3Addresses[recipient] = icoPart3Deadline;
             frozenAddressList[recipient] = icoPart3Deadline;
         }
