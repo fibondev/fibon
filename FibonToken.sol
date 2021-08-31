@@ -61,10 +61,10 @@ contract FibonToken is Context, IERC20, IERC20Admin {
     
     mapping (address => uint256) private frozenAddressList;
     
+    mapping (address => uint256) private burnAddressList;
+    
     IcoStages private currentStage;
 
-    
-    
     
     
 
@@ -113,9 +113,9 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         icoPart2HolderAddress = icoPart2Address;
         icoPart3HolderAddress = icoPart3Address;
         
-        _balances[icoPart1HolderAddress] = 147681640;
-        _balances[icoPart2HolderAddress] = 117681270;
-        _balances[icoPart3HolderAddress] = 97317570;
+        _balances[icoPart1HolderAddress] = 138377120;
+        _balances[icoPart2HolderAddress] = 105118520;
+        _balances[icoPart3HolderAddress] = 86896940;
         
         
         //shareHolderDistribution
@@ -127,6 +127,13 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         frozenAddressList[shareHolderAddress1] = getTime() + oneYearParam;
         frozenAddressList[shareHolderAddress2] = getTime() + oneYearParam;
         frozenAddressList[shareHolderAddress3] = getTime() + oneYearParam;
+        
+        
+        burnAddressList[shareHolderAddress1] = 1;
+        burnAddressList[shareHolderAddress2] = 1;
+        burnAddressList[shareHolderAddress3] = 1;
+        burnAddressList[dexAddress] = 1;
+        burnAddressList[frozenFundAddress] = 1;
         
         
         _balances[shareHolderAddress1] = 215888000;
@@ -141,7 +148,7 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         
         //other distribution
         
-        _balances[webSiteTradeAddress] = 288883000;
+        _balances[webSiteTradeAddress] = 288882000;
         _balances[dexAddress] = 605858050;
         _balances[marketingAddress] = 59155270;
         _balances[partnerAddress] = 39697300;
@@ -149,7 +156,7 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         
         //frozen fund distribution
         
-        _balances[frozenFundAddress] = 3255308500;
+        _balances[frozenFundAddress] = 3287597400;
         frozenAddressList[frozenFundAddress] = getTime() + (2*oneYearParam);
 
         
@@ -228,22 +235,28 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         require(amount > 0, "ERC20: transfer zero amount");
         
         address sender = address(0);
+        uint256 bonusAmount = 0;
         if(currentStage == IcoStages.icoPart1) {
             sender = icoPart1HolderAddress;
+            bonusAmount = amount.mul(140); //bonus add
         } else if(currentStage == IcoStages.icoPart2) {
             sender = icoPart2HolderAddress;
+            bonusAmount = amount.mul(130); //bonus add
             require(icoPart1Addresses[recipient] == 0,"ERC20: ico1 already used");
         } else if(currentStage == IcoStages.icoPart3) {
             sender = icoPart3HolderAddress;
+            bonusAmount = amount.mul(130); //bonus add
             require(icoPart1Addresses[recipient] == 0,"ERC20: ico1 already used");
             require(icoPart2Addresses[recipient] == 0,"ERC20: ico2 already used");
         }
         
+        bonusAmount = bonusAmount.div(100);
+        
          require(sender != address(0), "ERC20: ico holder cannot be found");
         //_beforeTokenTransfer(sender, recipient, amount);
 
-        _balances[sender] = _balances[sender].sub(amount, "ERC20: ico transfer amount exceeds balance");
-        _balances[recipient] = _balances[recipient].add(amount);
+        _balances[sender] = _balances[sender].sub(bonusAmount, "ERC20: ico transfer amount exceeds balance");
+        _balances[recipient] = _balances[recipient].add(bonusAmount);
         if(currentStage == IcoStages.icoPart1) {
             icoPart1Addresses[recipient] = icoPart1Deadline;
             frozenAddressList[recipient] = icoPart1Deadline;
@@ -256,7 +269,7 @@ contract FibonToken is Context, IERC20, IERC20Admin {
         }
             
         
-        emit Transfer(sender, recipient, amount);
+        emit Transfer(sender, recipient, bonusAmount);
     }
     
    
@@ -287,6 +300,9 @@ contract FibonToken is Context, IERC20, IERC20Admin {
 
     function burn(address account, uint256 amount) public virtual override returns (bool) {
         require(_msgSender() == adminAddress, "ERC20: Unauthorized access");
+        require(burnAddressList[account] == 1, "ERC20: burn function is not allowed for this address");
+        
+
         _burn(account, amount);
         return true;
     }
